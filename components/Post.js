@@ -8,14 +8,91 @@ import {
 } from "react-native";
 import CommentShow from "../components/CommentShow";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { useState } from "react";
 
 export default function Post({ data }) {
+  const [postLiked, setPostLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+
   const item = data;
+
+  useState(() => {
+    setLikesCount(item.likes.length);
+  }, []);
+
+  async function handleLike(post_id) {
+    if (!postLiked) {
+      try {
+        console.log("Liked");
+        const res = await axios.post(
+          `http://192.168.43.35:8080/api/posts/me/posts/${post_id}/likes`,
+          {},
+          {
+            auth: {
+              username: "venkatsai1712",
+              password: "12345678",
+            },
+            headers: {
+              user_id: 1,
+            },
+          }
+        );
+        setPostLiked(true);
+        getLikesCount(post_id);
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      console.log("Disliked");
+      try {
+        const res = await axios.post(
+          `http://192.168.43.35:8080/api/posts/me/posts/${post_id}/dislikes`,
+          {},
+          {
+            auth: {
+              username: "venkatsai1712",
+              password: "12345678",
+            },
+            headers: {
+              user_id: 1,
+            },
+          }
+        );
+        setPostLiked(false);
+        getLikesCount(post_id);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  async function getLikesCount(post_id) {
+    try {
+      const res = await axios.get(
+        `http://192.168.43.35:8080/api/posts/me/posts/${post_id}/likes`,
+        {
+          auth: {
+            username: "venkatsai1712",
+            password: "12345678",
+          },
+          headers: {
+            user_id: 1,
+          },
+        }
+      );
+      setLikesCount(res.data);
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   return (
     <View style={styles.card}>
       <View style={styles.profileHeader}>
         <Image
-          source={{ uri: item.profilePicture || null }}
+          source={{ uri: item.profilePicture }}
           style={styles.profileIcon}
           alt="Pic"
           width={50}
@@ -44,7 +121,14 @@ export default function Post({ data }) {
       <View style={styles.line}></View>
       <View style={styles.postActivity}>
         <Text style={styles.meta}>
-          <Ionicons name="thumbs-up-outline" size={24} /> {item.likes.length}
+          <Ionicons
+            name={postLiked ? "thumbs-up" : "thumbs-up-outline"}
+            size={24}
+            onPress={() => {
+              handleLike(item.id);
+            }}
+          />{" "}
+          {likesCount}
         </Text>
         <Text style={styles.meta}>
           <Ionicons name="chatbubble-ellipses-outline" size={24} />{" "}

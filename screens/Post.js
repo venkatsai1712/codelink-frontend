@@ -18,7 +18,7 @@ export default function Post() {
             password: "12345678",
           },
           headers: {
-            user_id: "1",
+            user_id: "3",
           },
         }
       );

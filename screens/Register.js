@@ -7,28 +7,33 @@ import {
   StyleSheet,
   ActivityIndicator,
   Modal,
-  Pressable,
 } from "react-native";
 import axios from "axios";
 
-export default function Login({ navigation }) {
+export default function Register({ navigation }) {
   const [email, setEmail] = useState("illavenkatsai1712@gmail.com");
   const [password, setPassword] = useState("12345678");
-  const [showError, setShowError] = useState(false);
+  const [firstName, setFirstName] = useState("venkat");
+  const [lastName, setLastName] = useState("illa");
+  const [username, setUsername] = useState("illavenkat");
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit() {
     setLoading(true);
     try {
-      const res = await axios.post("http://192.168.43.35:8080/api/auth/login", {
-        email,
-        password,
-      });
-      setShowError(false);
+      const res = await axios.post(
+        "http://192.168.43.35:8080/api/auth/register",
+        {
+          firstName,
+          lastName,
+          username,
+          email,
+          password,
+        }
+      );
       navigation.replace("Tabs");
     } catch (err) {
       setLoading(false);
-      setShowError(true);
       console.log(err);
     }
   }
@@ -36,7 +41,27 @@ export default function Login({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Register</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
 
         <TextInput
           style={styles.input}
@@ -52,19 +77,8 @@ export default function Login({ navigation }) {
           onChangeText={setPassword}
         />
 
-        {showError && <Text style={styles.error}>Invalid Credentials</Text>}
-
         <View style={{ width: "100%", marginTop: 10 }}>
-          <Button title="Login" onPress={handleSubmit} />
-        </View>
-        <View style={{ width: "100%", marginTop: 10 }}>
-          <Pressable
-            onPress={() => {
-              navigation.replace("Register");
-            }}
-          >
-            <Text>Not Registered ?</Text>
-          </Pressable>
+          <Button title="Register" onPress={handleSubmit} />
         </View>
         <Modal animationType="none" transparent={true} visible={loading}>
           <View style={styles.modal}>

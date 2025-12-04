@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
+  Button,
 } from "react-native";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -13,12 +14,13 @@ import Post from "../components/Post";
 export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     async function getPosts() {
       try {
         const res = await axios.get(
-          "http://192.168.43.35:8080/api/posts/me/posts",
+          "http://192.168.43.35:8080/api/posts/feed/posts",
           {
             auth: {
               username: "venkatsai1712",
@@ -37,19 +39,27 @@ export default function Home() {
     }
 
     getPosts();
-  }, []);
+  }, [refresh]);
 
   return (
     <>
       {loaded ? (
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => {
-            console.log(item);
-            return <Post data={item} />;
-          }}
-        />
+        <>
+          <Button
+            title="Refresh"
+            onPress={() => {
+              setRefresh(!refresh);
+            }}
+          />
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => {
+              console.log(item);
+              return <Post data={item} />;
+            }}
+          />
+        </>
       ) : (
         <ActivityIndicator
           animating={!loaded}
